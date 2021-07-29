@@ -1,0 +1,82 @@
+\documentclass[]{article}
+   \usepackage{nopageno}
+%opening
+\title{UPA  - Ukládání a příprava dat \\ Projekt 1. část: návrh zpracování a uložení dat}
+
+\date{\vspace{-9ex}}
+%\date{}  % Toggle commenting to test
+%\author{Slávka Samuel\\ \texttt{xslavk02} \and Šajdík Ondrej\\ \texttt{xsajdi01} \and Šalgovič Marek\\ \texttt{xsalgo00}}
+\setlength{\voffset}{-0.75in}
+\begin{document}
+
+
+\maketitle
+
+
+%\centerline{\rule{13cm}{0.4pt}}
+
+\paragraph{Zvolená téma:}
+
+03: Kurzy devizového trhu 
+\paragraph{Riešitelia:}
+\begin{itemize}
+\item Samuel Slávka - \texttt{xslavk02} \item Ondrej Šajdík - \texttt{xsajdi01} \item Marek Šalgovič - \texttt{xsalgo00}
+\end{itemize}
+
+ \paragraph{Zvolené dotazy a formulácie vlastného dotazu:}
+
+\begin{itemize}
+\item \textbf{Dotaz skupiny A} - vytvořte žebříček měn, které v daném období nejvíce posílily/oslabily
+\item \textbf{Dotaz skupiny B} - najděte skupiny měn s podobným chováním (skupiny měn, které obvykle současně posilují/oslabují)
+\item \textbf{Vlastný dotaz} - nájdenie najstabilnejšej meny počas určitého obdobia
+\end{itemize}
+
+Vstupom vlastného dotazu sú dva vyhovujúce dátumy. Dotazom sa nájde mena, ktorá bola medzi týmito dvomi dňami najstabilnejšia. Stabilita meny je vyhodnotená ako súčet odchyliek v jednotlivých dňoch od priemernej hodnoty v tomto období. Nejedná sa teda iba o rozdiel hodnôt meny v začiatočnom a koncovom čase.
+
+\paragraph{Stručná charakteristika zvolenej dátovej sady:}
+
+Zadaná dátová sada obsahuje viacero súborov vhodných pre získanie potrebných dát. Zdroj ponúka získanie súboru s dátami pre konkrétny deň na adrese: 
+\begin{center}
+ https://www.cnb.cz/cs/financni-trhy/devizovy-trh/kurzy-devizoveho-trhu/kurzy-devizoveho-trhu/denni\_kurz.txt?date=DATE
+ \end{center}
+  kde zvolený URL query parameter DATE určuje dáta pre zvolený deň.
+  
+   Pre množstvo nepotrebných informácií pre naše dotazy, ako napríklad meno krajiny alebo celý názov meny, sme sa rozhodli použiť súbor s dátami za celý zvolený rok. Adresa pre ročné dáta: 
+\begin{center}
+https://www.cnb.cz/cs/financni-trhy/devizovy-trh/kurzy-devizoveho-trhu/kurzy-devizoveho-trhu/rok.txt?rok=YEAR
+\end{center}
+kde URL parameter YEAR určuje rok.
+
+V ročnom súbore sú dáta uložené v tabuľkovej schéme. Prvý stĺpec tabuľky obsahuje dátum, pre ktorý platia kurzy v riadku. V záhlaví tabuľky sú konkrétne skratky mien spolu s ich množstvom. 
+
+\pagebreak
+
+Príklad tabuľky:
+
+\begin{center}
+\begin{tabular}{ |c|c|c| } 
+ \hline
+ Dátum & X mena1 & Y mena2 \\ 
+  \hline
+ 1. 1. 2020  & w & x \\ 
+  \hline
+ 2. 1. 2020 & y & z \\ 
+ \hline
+\end{tabular}
+\end{center}
+
+kde X,Y je množstvo meny a w, x, y, z sú konkrétne kurzy. (pozn.: celkový kurz meny je rovný pomeru kurz/množstvo).
+
+Dáta budú spracované stiahnutím tohto súboru a následnom parsovaním tabuľky a uložením do NoSQL databázy.
+
+\paragraph{Spôsob získania a spracovania dat:} Dáta sme získali pomocou \texttt{HTTP GET} dotazu v jazyku \textit{Golang}.  Parsovanie výsledku je riešené rozdelením textového dokumentu podľa znaku '\textbar', ktorý oddeľuje jednotlivé buňky v tabuľke. Výsledok sa uložil do dátovej štruktúry skladajúcej sa z dátumu a kolekcie dvojíc - skratka názvu meny a jej hodnota pre daný dátum. Hodnota je vyjadrená celkovým kurzom menu, ako sme zadefinovali vyššie.
+
+
+\paragraph{Zvolený spôsob uloženía surových dat:}
+
+Na uloženie dát zo zdrojových súborov sme sa rozhodli použiť NoSQL databázu typu dokumentovej databázy. Dokumentová databáza umožňuje ukladať dokumenty do kolekcií. Tieto dokumenty sú často reprezentované štruktúrou \texttt{JSON}. V kolekcii, čo je vlastne súbor dokumentov, sa môžu nachádzať aj dokumenty s rozdielnymi schémami. V našom prípade nám to umožňuje uložiť aj novo pridané meny do zdrojových súborov.  Príkladom konkrétnej dokumentovej NoSQL databázy je \textit{mongoDB}. 
+
+Pre uloženie dát sme navrhli kolekciu \textit{days}, ktorej jednotlivé dokumenty reprezentujú stav každej meny v deň podľa zdrojových súborov. 
+
+
+\end{document}

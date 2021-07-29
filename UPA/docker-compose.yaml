@@ -1,0 +1,60 @@
+version: '3.2'
+
+services:
+
+  fetch:
+    image: 'fetch:0.3'
+    container_name: fetch
+    build:
+      context: ./fetch
+      dockerfile: Dockerfile
+    environment:
+      MONGO_URI: 'mongodb://mongo-service:27017'
+      GO111MODULE: 'on'
+
+  select:
+    image: 'select:1.1'
+    container_name: select
+    build:
+      context: ./select
+      dockerfile: Dockerfile
+
+  mongo-service:
+    image: 'mongo:latest'
+    container_name: 'mongo-container'
+    environment:
+      - 'MONGO_INITDB_DATABASE=upa'
+    ports:
+      - '27017:27017'
+    volumes:
+      - type: bind
+        source: './database/generated/mongodb/data/db'
+        target: '/data/db'
+      - type: bind
+        source: './database/generated/shared'
+        target: '/shared'
+      - type: bind
+        source: './transfer'
+        target: '/transfer'
+
+  postgresql-service:
+    environment:
+      - 'POSTGRES_DB=upa'
+      - 'POSTGRES_USER=upa'
+      - 'POSTGRES_PASSWORD=upa'
+    ports:
+      - '5432:5432'
+    build:
+      context: ./database
+      dockerfile: Dockerfile-postgreSQL
+    volumes:
+      - type: bind
+        source: './database/generated/postgresql/data'
+        target: '/var/lib/postgresql/data'
+      - type: bind
+        source: './database/generated/shared'
+        target: '/shared'
+      - type: bind
+        source: './transfer'
+        target: '/transfer'
+
