@@ -1,0 +1,12 @@
+S,A,B,C,D,E,F
+a,b,c,d,e,f,g,h,i,j,k,l,m
+S
+S->aSb
+S->A
+A->c
+A->BCD
+B->BC
+C->d
+D->e
+E->Ek
+E->k

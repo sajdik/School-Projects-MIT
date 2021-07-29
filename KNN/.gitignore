@@ -1,0 +1,4 @@
+
+*.pyc
+dataset/games.csv
+dataset/dataset.csv

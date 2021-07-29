@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# number of processors
+if [ $# -lt 1 ];then 
+    proc_num=5;
+else
+    proc_num=$1;
+fi;
+# input size
+numbers=$(echo "2^($proc_num-1)" | bc)
+# compile
+mpic++ --prefix /usr/local/share/OpenMPI -o pms pms.cpp
+# create file with random numbers
+dd if=/dev/random bs=1 count=$numbers of=numbers status=none
+# run
+mpirun --prefix /usr/local/share/OpenMPI -np $proc_num pms
+# clean
+rm -f pms numbers
+
